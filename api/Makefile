@@ -11,10 +11,12 @@ PYTHON_TEST_PROXY_NETWORK ?= "proxy-network-python-test"
 .PHONY: default
 default:
 
+.PHONY: build
+build:
+	docker build -t $(PYTHON_TEST_API_IMAGE_NAME):$(PYTHON_TEST_API_IMAGE_VERSION) -f Dockerfile .
+
 .PHONY: run
 run:
-	- docker network create $(PYTHON_TEST_PROXY_NETWORK)
-	sleep 1
 	APP_IMAGE_VERSION=$(PYTHON_TEST_API_IMAGE_VERSION) \
     APP_IMAGE_NAME=$(PYTHON_TEST_API_IMAGE_NAME) \
     APP_PROXY_NETWORK=$(PYTHON_TEST_PROXY_NETWORK) \
@@ -25,14 +27,8 @@ run:
     APP_DB_PORT=$(PYTHON_TEST_DB_PORT) \
     docker-compose -p $(PYTHON_TEST_API_PROJECT) -f docker-compose.yaml up -d
 
-.PHONY: build
-build:
-	docker build -t $(PYTHON_TEST_API_IMAGE_NAME):$(PYTHON_TEST_API_IMAGE_VERSION) -f Dockerfile .
-
 .PHONY: down
 down:
-	- docker network create $(PYTHON_TEST_PROXY_NETWORK)
-	sleep 1
 	APP_IMAGE_VERSION=$(PYTHON_TEST_API_IMAGE_VERSION) \
     APP_IMAGE_NAME=$(PYTHON_TEST_API_IMAGE_NAME) \
     APP_PROXY_NETWORK=$(PYTHON_TEST_PROXY_NETWORK) \
