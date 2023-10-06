@@ -1,7 +1,7 @@
 import uuid
 
 from rest_framework import viewsets, status
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -26,34 +26,40 @@ class EventController(APIView):
         self.crud = BaseCRUD(Session)
 
     def post(self, request):
-        user_ip = request.META.get("REMOTE_ADDR")
-        data = {
-            "id": uuid.uuid4(),
-            "user_ip": user_ip
-        }
-        self.crud.insert(Event, **data)
-        self.crud.commit()
-        return Response(data={"result": "new user event was created"}, status=201)
+        try:
+            user_ip = request.META.get("REMOTE_ADDR")
+            data = {
+                "id": uuid.uuid4(),
+                "user_ip": user_ip
+            }
+            self.crud.insert(Event, **data)
+            self.crud.commit()
+            return Response(data={"result": "new user event was created"}, status=status.HTTP_201_CREATED)
+        except Exception:
+            raise ParseError(detail="Bad request, for any other error. Error reason in logs.")
 
     def get(self, request):
-        user_ip = request.META.get("REMOTE_ADDR")
-        res = 0  # even/odd digit counter
-        for digit in user_ip:
-            if digit.isdigit():
-                if int(digit) % 2:
-                    res += 1
-                else:
-                    res -= 1
-        if res != 0:
-            raise PermissionDenied(detail="Invalid user IP")
-        stmt = text("SELECT * FROM events ORDER BY date_created DESC LIMIT 5")
-        db_data = self.crud.get_many_by_statement(stmt)
-        api_data = [
-            {
-                "id": row["id"],
-                "eventTime": row["date_created"].isoformat(),
-                "userIpAddress": row["user_ip"]
-            }
-            for row in db_data
-        ]
-        return Response(data=api_data, status=status.HTTP_200_OK)
+        try:
+            user_ip = request.META.get("REMOTE_ADDR")
+            res = 0  # even/odd digit counter
+            for digit in user_ip:
+                if digit.isdigit():
+                    if int(digit) % 2:
+                        res += 1
+                    else:
+                        res -= 1
+            if res != 0:
+                raise PermissionDenied(detail="Invalid user IP")
+            stmt = text("SELECT * FROM events ORDER BY date_created DESC LIMIT 5")
+            db_data = self.crud.get_many_by_statement(stmt)
+            api_data = [
+                {
+                    "id": row["id"],
+                    "eventTime": row["date_created"].isoformat(),
+                    "userIpAddress": row["user_ip"]
+                }
+                for row in db_data
+            ]
+            return Response(data=api_data, status=status.HTTP_200_OK)
+        except Exception:
+            raise ParseError(detail="Bad request, for any other error. Error reason in logs.")
