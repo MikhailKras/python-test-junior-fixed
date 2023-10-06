@@ -17,6 +17,9 @@ build:
 
 .PHONY: run
 run:
+	if ! docker network inspect "proxy-network-python-test" >/dev/null 2>&1 ; then \
+    docker network create "proxy-network-python-test" ; \
+    fi
 	sleep 1
 	APP_IMAGE_VERSION=$(PYTHON_TEST_MIGRATIONS_IMAGE_VERSION) \
     APP_IMAGE_NAME=$(PYTHON_TEST_MIGRATIONS_IMAGE_NAME) \
@@ -30,6 +33,10 @@ run:
 
 .PHONY: down
 down:
+	if ! docker network inspect "proxy-network-python-test" >/dev/null 2>&1 ; then \
+    docker network create "proxy-network-python-test" ; \
+    fi
+	sleep 1
 	APP_IMAGE_VERSION=$(PYTHON_TEST_MIGRATIONS_IMAGE_VERSION) \
     APP_IMAGE_NAME=$(PYTHON_TEST_MIGRATIONS_IMAGE_NAME) \
     APP_PROXY_NETWORK=$(PYTHON_TEST_PROXY_NETWORK) \

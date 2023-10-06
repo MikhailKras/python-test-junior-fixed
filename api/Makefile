@@ -17,6 +17,10 @@ build:
 
 .PHONY: run
 run:
+	if ! docker network inspect "proxy-network-python-test" >/dev/null 2>&1 ; then \
+    docker network create "proxy-network-python-test" ; \
+    fi
+	sleep 1
 	APP_IMAGE_VERSION=$(PYTHON_TEST_API_IMAGE_VERSION) \
     APP_IMAGE_NAME=$(PYTHON_TEST_API_IMAGE_NAME) \
     APP_PROXY_NETWORK=$(PYTHON_TEST_PROXY_NETWORK) \
@@ -27,8 +31,14 @@ run:
     APP_DB_PORT=$(PYTHON_TEST_DB_PORT) \
     docker-compose -p $(PYTHON_TEST_API_PROJECT) -f docker-compose.yaml up -d
 
+
+
 .PHONY: down
 down:
+	if ! docker network inspect "proxy-network-python-test" >/dev/null 2>&1 ; then \
+    docker network create "proxy-network-python-test" ; \
+    fi
+	sleep 1
 	APP_IMAGE_VERSION=$(PYTHON_TEST_API_IMAGE_VERSION) \
     APP_IMAGE_NAME=$(PYTHON_TEST_API_IMAGE_NAME) \
     APP_PROXY_NETWORK=$(PYTHON_TEST_PROXY_NETWORK) \
@@ -38,3 +48,4 @@ down:
     APP_DB_HOST=$(PYTHON_TEST_DB_HOST) \
     APP_DB_PORT=$(PYTHON_TEST_DB_PORT) \
 	docker-compose -p $(PYTHON_TEST_API_PROJECT) -f docker-compose.yaml down
+
