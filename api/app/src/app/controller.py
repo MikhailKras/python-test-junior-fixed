@@ -49,7 +49,7 @@ class EventController(APIView):
                     else:
                         res -= 1
             if res != 0:
-                raise PermissionDenied(detail="Invalid user IP")
+                raise PermissionDenied(detail="Permission denied. User IP is not valid.")
             stmt = text("SELECT * FROM events ORDER BY date_created DESC LIMIT 5")
             db_data = self.crud.get_many_by_statement(stmt)
             api_data = [
@@ -61,5 +61,7 @@ class EventController(APIView):
                 for row in db_data
             ]
             return Response(data=api_data, status=status.HTTP_200_OK)
+        except PermissionDenied as e:
+            raise PermissionDenied(detail=e)
         except Exception:
-            raise ParseError(detail="Bad request, for any other error. Error reason in logs.")
+            raise ParseError(detail=f"Bad request, for any other error. Error reason in logs")
