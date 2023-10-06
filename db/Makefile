@@ -16,7 +16,6 @@ build:
 
 .PHONY: run
 run:
-	- docker network create $(PYTHON_TEST_DB_PROXY_NETWORK)
 	- mkdir -p $(PYTHON_TEST_DB_DATA_PATH)
 	APP_PROXY_NETWORK=$(PYTHON_TEST_DB_PROXY_NETWORK) \
 	APP_IMAGE_VERSION=$(PYTHON_TEST_DB_IMAGE_VERSION) \
@@ -29,7 +28,6 @@ run:
 
 .PHONY: down
 down:
-	- docker network create $(PYTHON_TEST_DB_PROXY_NETWORK)
 	- mkdir -p $(PYTHON_TEST_DB_DATA_PATH)
 	sleep 1
 	APP_PROXY_NETWORK=$(PYTHON_TEST_DB_PROXY_NETWORK) \
