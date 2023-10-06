@@ -32,6 +32,8 @@ paths:
                   $ref: "#/components/schemas/UserEvent"
         '400':
           description: Bad request, for any other error. Error reason in logs.
+        '403':
+          description: Permission denied. User IP is not valid.
 components:
   schemas:
     UserEvent:
